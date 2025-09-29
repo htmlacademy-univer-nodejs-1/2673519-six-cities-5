@@ -1,8 +1,8 @@
-export { type User } from './user.interface.js';
-export { type Offer } from './offer.interface.js';
-export { type Comment } from './comment.interface.js';
-export { type Coordinates } from './coordinates.interface.js';
-export { type Amenity } from './amenity.enum.js';
-export { type City } from './city.enum.js';
-export { type HousingType } from './housing-type.enum.js';
-export { type UserType } from './user-type.enum.js';
+export { User } from './user.interface.js';
+export { Offer } from './offer.interface.js';
+export { Comment } from './comment.interface.js';
+export { Coordinates } from './coordinates.interface.js';
+export { Amenity, tryParseAmenity } from './amenity.type.js';
+export { City, tryParseCity } from './city.type.js';
+export { HousingType, tryParseHousingType } from './housing-type.type.js';
+export { UserType, tryParseUserType } from './user-type.type.js';
