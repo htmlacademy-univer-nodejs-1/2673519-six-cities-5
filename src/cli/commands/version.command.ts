@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Command } from './command.interface.js';
-import { packageJsonPath } from '../../shared/const/config.const.js';
+import { packageJsonPath } from '../../shared/config/config.consts.js';
 import chalk from 'chalk';
 
 type PackageJSONConfig = {
