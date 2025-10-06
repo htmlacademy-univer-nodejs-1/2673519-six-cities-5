@@ -7,3 +7,4 @@ export { cities, City, tryParseCity, CITY_COORDS } from './city.type.js';
 export { housingTypes, HousingType, tryParseHousingType } from './housing-type.type.js';
 export { userTypes, UserType, tryParseUserType } from './user-type.type.js';
 export { MockServerData } from './mock-server-data.type.js';
+export { Component } from './component.enum.js';
