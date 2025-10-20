@@ -1,3 +1,5 @@
+import { Coordinates } from './coordinates.interface.js';
+
 export type MockServerData = {
   titles: string[];
   descriptions: string[];
@@ -6,5 +8,8 @@ export type MockServerData = {
   images: string[];
   types: string[];
   goods: string[];
+  users: string[];
   emails: string[];
+  passwords: string[];
+  locations: Coordinates[];
 };

@@ -15,7 +15,9 @@ export class GenerateCommand implements Command {
     const offerCount = Number.parseInt(count, 10);
 
     try {
-      const data: MockServerData = await got.get(url).json();
+      const response = await got.get(url).json() as unknown;
+      const maybeWrapped = response as { api?: MockServerData };
+      const data = maybeWrapped.api ?? (response as MockServerData);
       const tsvOfferGenerator = new TSVOfferGenerator(data);
       const tsvFileWriter = new TSVFileWriter(path);
 

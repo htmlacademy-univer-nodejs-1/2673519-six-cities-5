@@ -3,8 +3,13 @@ import { Coordinates } from './coordinates.interface.js';
 export const cities = ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseldorf'] as const;
 export type City = typeof cities[number];
 
-export function tryParseCity(str: string): City | undefined {
+export function tryParseCity(str: string): City {
   const foundStr = cities.find((val) => val === str);
+  if (!foundStr) {
+    throw new Error(
+      `Invalid city: "${str}". Available cities: ${cities.join(', ')}`
+    );
+  }
   return foundStr;
 }
 
