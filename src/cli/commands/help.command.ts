@@ -12,7 +12,7 @@ export class HelpCommand implements Command {
     console.info('Команды:\n');
     console.info(`   ${chalk.cyanBright('--version')}:\t\t\t${chalk.green('# выводит номер версии')}`);
     console.info(`   ${chalk.cyanBright('--help')}:\t\t\t${chalk.green('# печатает этот текст')}`);
-    console.info(`   ${chalk.cyanBright('--import')} <${chalk.blue('path')}>:\t\t${chalk.green('# импортирует данные из TSV')}`);
-    console.info(`   ${chalk.cyanBright('--generate')} <${chalk.blue('n')}> <${chalk.blue('path')}> <${chalk.blue('url')}>:\t${chalk.green('# генерирует произвольное количество тестовых данных')}`);
+    console.info(`   ${chalk.cyanBright('--import')} ${chalk.blue('<path> <DB_USER> <DB_PASSWORD> <DB_HOST> <DB_NAME> <SALT>')}:\t\t${chalk.green('# импортирует данные из TSV в MongoDB')}`);
+    console.info(`   ${chalk.cyanBright('--generate')} ${chalk.blue('<n>')} ${chalk.blue('<path>')} ${chalk.blue('<url>')}:\t${chalk.green('# генерирует произвольное количество тестовых данных')}`);
   }
 }

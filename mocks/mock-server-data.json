@@ -56,12 +56,37 @@
             "Towels",
             "Fridge"
         ],
+        "users": [
+            "Oleg",
+            "Gerasim",
+            "Solovied",
+            "Dobrinia",
+            "Alex",
+            "Tugarin"
+        ],
+        "passwords": [
+            "olegthebest123",
+            "qwerty",
+            "password",
+            "nikitich23",
+            "popov3044",
+            "zmej_mongol"
+        ],
         "emails": [
             "oleg_gerasimov@google.com",
             "krym14@mail.ru",
             "marat_ak47@mail.ru",
             "samail_1978@goole.com",
             "oksana_vtorushina@google.com"
+        ],
+        "locations": [
+            {"latitude": 48.85661, "longitude": 2.350499},
+            {"latitude": 50.938361, "longitude": 6.959974},
+            {"latitude": 50.846557, "longitude": 4.351697},
+            {"latitude": 52.370216, "longitude": 4.895168},
+            {"latitude": 53.550341, "longitude": 10.000654},
+            {"latitude": 51.227402, "longitude": 6.775314},
+            {"latitude": 51.225402, "longitude": 6.776314}
         ]
     }
 }

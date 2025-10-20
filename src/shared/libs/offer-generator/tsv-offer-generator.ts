@@ -1,5 +1,5 @@
 import { OfferGenerator } from './offer-generator.interface.js';
-import { MockServerData, City, cities, HousingType, housingTypes, amenities, CITY_COORDS } from '../../types/index.js';
+import { MockServerData, City, cities, HousingType, housingTypes, amenities, CITY_COORDS, userTypes } from '../../types/index.js';
 import { generateRandomValue, getRandomBoolean, getRandomItem, getRandomItems } from '../../helpers/index.js';
 import * as CONSTS from '../../config/config.consts.js';
 
@@ -23,7 +23,10 @@ export class TSVOfferGenerator implements OfferGenerator {
     const guestsCount = generateRandomValue(CONSTS.MIN_GUESTS, CONSTS.MAX_GUESTS);
     const price = generateRandomValue(CONSTS.MIN_PRICE, CONSTS.MAX_PRICE);
     const amens = getRandomItems([...Object.values(amenities)]).join(';');
-    const owner = getRandomItem<string>(this.mockData.emails);
+    const ownerName = getRandomItem<string>(this.mockData.users);
+    const ownerEmail = getRandomItem<string>(this.mockData.emails).toString();
+    const ownerAvatar = getRandomItem<string>(this.mockData.images).toString();
+    const ownerType = getRandomItem([...userTypes]).toString();
     const commentsCount = generateRandomValue(0, 100);
     const coords = `${CITY_COORDS[city].latitude},${CITY_COORDS[city].longitude}`;
 
@@ -42,7 +45,10 @@ export class TSVOfferGenerator implements OfferGenerator {
       guestsCount,
       price,
       amens,
-      owner,
+      ownerName,
+      ownerEmail,
+      ownerAvatar,
+      ownerType,
       commentsCount,
       coords
     ].join('\t');

@@ -1,15 +1,18 @@
 import { Offer } from '../../types/offer.interface.js';
 import { OfferParser } from './offer-parser.interface.js';
-import { tryParseCity, tryParseHousingType, tryParseAmenity, Amenity } from '../../types/index.js';
+import { tryParseCity, tryParseHousingType, tryParseAmenity, Amenity, tryParseUserType } from '../../types/index.js';
 
 export class TSVOfferParser implements OfferParser {
   public parse(line: string): Offer {
     const [
       title, description, openDate, city, preview, images,
       isPremium, isFavorite, rating, housingType, rooms,
-      guests, price, amenities, email, commentsCount,
-      latitude, longitude
+      guests, price, amenities, ownerName, ownerEmail,
+      ownerAvatar, ownerType, commentsCount, coordinatesString
     ] = line.split('\t');
+
+    // Parse coordinates from "latitude,longitude" format
+    const [latitude, longitude] = coordinatesString.split(',');
 
     return {
       title,
@@ -28,7 +31,13 @@ export class TSVOfferParser implements OfferParser {
       amenities: amenities.split(';')
         .map((amenity) => tryParseAmenity(amenity))
         .filter((amenity): amenity is Amenity => amenity !== undefined),
-      owner: email,
+      owner: {
+        name: ownerName,
+        email: ownerEmail,
+        avatar: ownerAvatar,
+        password: '',
+        type: tryParseUserType(ownerType)
+      },
       commentsCount: parseInt(commentsCount, 10),
       coordinates: {
         latitude: parseFloat(latitude),
