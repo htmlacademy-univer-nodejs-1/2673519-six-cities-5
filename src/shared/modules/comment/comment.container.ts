@@ -1,0 +1,12 @@
+import { types } from '@typegoose/typegoose';
+import { ICommentService } from './comment-service.interface.js';
+import { Component } from '../../types/index.js';
+import { CommentEntity, CommentModel } from './comment.entity.js';
+import { ContainerModule, ContainerModuleLoadOptions } from 'inversify';
+import { DefaultCommentService } from './default-comment.service.js';
+
+export const commentContainer: ContainerModule = new ContainerModule(
+  (options: ContainerModuleLoadOptions) => {
+    options.bind<ICommentService>(Component.CommentService).to(DefaultCommentService).inSingletonScope();
+    options.bind<types.ModelType<CommentEntity>>(Component.CommentModel).toConstantValue(CommentModel);
+  });

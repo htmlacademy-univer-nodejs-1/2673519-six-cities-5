@@ -3,8 +3,8 @@ import { Command } from './command.interface.js';
 import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
 import { TSVOfferParser } from '../../shared/libs/offer-parser/index.js';
 import { getMongoDbURI } from '../../shared/helpers/index.js';
-import { UserService } from '../../shared/modules/user/index.js';
-import { DefaultOfferService, OfferModel, OfferService } from '../../shared/modules/offer/index.js';
+import { IUserService } from '../../shared/modules/user/index.js';
+import { DefaultOfferService, OfferModel, IOfferService } from '../../shared/modules/offer/index.js';
 import { DatabaseClient, MongoDatabaseClient } from '../../shared/libs/db-client/index.js';
 import { ConsoleLogger, ILogger } from '../../shared/libs/logger/index.js';
 import { DefaultUserService, UserModel } from '../../shared/modules/user/index.js';
@@ -13,8 +13,8 @@ import { Offer } from '../../shared/types/index.js';
 
 export class ImportCommand implements Command {
   private dbClient: DatabaseClient;
-  private userService: UserService;
-  private offerService: OfferService;
+  private userService: IUserService;
+  private offerService: IOfferService;
   private readonly logger: ILogger;
   private salt: string;
 
