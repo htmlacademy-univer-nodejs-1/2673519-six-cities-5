@@ -1,11 +1,11 @@
 import { DocumentType, types } from '@typegoose/typegoose';
-import { CreateUserDto, UserEntity, UserService } from './index.js';
+import { CreateUserDto, UserEntity, IUserService } from './index.js';
 import { inject, injectable } from 'inversify';
 import { Component } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 
 @injectable()
-export class DefaultUserService implements UserService {
+export class DefaultUserService implements IUserService {
   constructor(
     @inject(Component.Logger) private readonly logger: ILogger,
     @inject(Component.UserModel) private readonly userModel: types.ModelType<UserEntity>
