@@ -8,3 +8,7 @@ export { housingTypes, HousingType, tryParseHousingType } from './housing-type.t
 export { userTypes, UserType, tryParseUserType } from './user-type.type.js';
 export { MockServerData } from './mock-server-data.type.js';
 export { Component } from './component.enum.js';
+export { HttpMethod } from './http-method.enum.js';
+export { RequestBody } from './request-body.type.js';
+export { RequestParams } from './request-params.type.js';
+export { IRoute } from './route.interface.js';
