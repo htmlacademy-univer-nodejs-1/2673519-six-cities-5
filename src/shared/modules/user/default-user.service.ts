@@ -25,6 +25,16 @@ export class DefaultUserService implements IUserService {
     return this.userModel.findOne({email});
   }
 
+  public async exists(documentId: string): Promise<boolean> {
+    return (await this.userModel.exists({ _id: documentId })) !== null;
+  }
+
+  public async updateAvatar(userId: string, avatarPath: string): Promise<DocumentType<UserEntity> | null> {
+    return this.userModel
+      .findByIdAndUpdate(userId, { avatar: avatarPath }, { new: true })
+      .exec();
+  }
+
   public async findOrCreate(dto: CreateUserDto, salt: string): Promise<DocumentType<UserEntity>> {
     const existedUser = await this.findByEmail(dto.email);
 
