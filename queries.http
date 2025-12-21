@@ -161,3 +161,46 @@ Authorization: {{userId}}
 DELETE {{baseUrl}}/favorites/{{offerId}} HTTP/1.1
 Authorization: {{userId}}
 
+############################################
+# Document Exists Middleware Test
+############################################
+
+### Create comment for non-existing offer (404)
+POST {{baseUrl}}/offers/fake-offer-id/comments HTTP/1.1
+Content-Type: application/json
+
+{
+	"text": "OMFG! Its amazing! Nice place!",
+	"rating": 5,
+	"userId": "{{userId}}"
+}
+
+### Create comment for offer with non-existing user (404)
+POST {{baseUrl}}/offers/{{offerId}}/comments HTTP/1.1
+Content-Type: application/json
+
+{
+	"text": "OMFG! Its amazing! Nice place!",
+	"rating": 5,
+	"userId": "fake-user-id"
+}
+
+### Create offer with non-existing user as owner (404)
+POST {{baseUrl}}/offers HTTP/1.1
+Content-Type: application/json
+
+{
+	"title": "Nice apartment in the city",
+	"description": "A long enough description for validation checks.",
+	"city": "Paris",
+	"preview": "preview.jpg",
+	"images": ["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg"],
+	"isPremium": true,
+	"housingType": "apartment",
+	"roomsCount": 2,
+	"guestsCount": 3,
+	"price": 120,
+	"amenities": ["Breakfast"],
+	"owner": "fake-user-id",
+	"coordinates": { "latitude": 48.85661, "longitude": 2.351499 }
+}

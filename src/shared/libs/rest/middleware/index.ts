@@ -1,2 +1,3 @@
 export * from './validate-objectid.middleware.js';
 export * from './validate-dto.middleware.js';
+export * from './document-exists.middleware.js';
