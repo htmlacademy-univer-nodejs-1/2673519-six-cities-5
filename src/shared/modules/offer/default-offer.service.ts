@@ -6,6 +6,7 @@ import { DocumentType, types } from '@typegoose/typegoose';
 import { OfferEntity } from './offer.entity.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
+import { Types } from 'mongoose';
 
 @injectable()
 export class DefaultOfferService implements IOfferService {
@@ -21,11 +22,11 @@ export class DefaultOfferService implements IOfferService {
   }
 
   public async findById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel.findById(offerId).populate(['author']).exec();
+    return this.offerModel.findById(offerId).populate(['owner']).exec();
   }
 
   public async find(): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel.find().populate(['author']).exec();
+    return this.offerModel.find().populate(['owner']).exec();
   }
 
   public async exists(documentId: string): Promise<boolean> {
@@ -37,51 +38,77 @@ export class DefaultOfferService implements IOfferService {
   }
 
   public async updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel.findByIdAndUpdate(offerId, dto, {new: true}).populate(['userId', 'categories']).exec();
+    return this.offerModel.findByIdAndUpdate(offerId, dto, { new: true }).populate(['owner']).exec();
   }
 
   public async addComment(offerId: string): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel.findByIdAndUpdate(offerId, {'$inc': { commentCount: 1 }}).exec();
+    return this.offerModel.findByIdAndUpdate(
+      offerId,
+      { $inc: { commentsCount: 1 } },
+      { new: true }
+    ).exec();
   }
 
   getFavourites(userId: string): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel.find({favoritedBy: userId}).populate(['author']).exec();
+    return this.offerModel.find({ isFavorite: userId }).populate(['owner']).exec();
   }
 
   addToFavourites(offerId: string, userId: string): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel.findByIdAndUpdate(
-      offerId, { $push: { favouritedBy: userId } }, { new: true }
-    ).populate(['author']).exec();
+    return this.offerModel
+      .findByIdAndUpdate(
+        offerId,
+        { $addToSet: { isFavorite: userId } },
+        { new: true }
+      )
+      .populate(['owner'])
+      .exec();
   }
 
   async deleteFromFavourites(offerId: string, userId: string): Promise<DocumentType<OfferEntity> | null> {
-    return await this.offerModel.findByIdAndUpdate(
-      offerId, { $pop: { favouritedBy: userId } }, { new: true }
-    ).populate(['author']).exec();
+    return this.offerModel
+      .findByIdAndUpdate(
+        offerId,
+        { $pull: { isFavorite: userId } },
+        { new: true }
+      )
+      .populate(['owner'])
+      .exec();
   }
 
   async calculateRating(offerId: string): Promise<void> {
+    const offerObjectId = new Types.ObjectId(offerId);
+
     const result = await this.offerModel.aggregate([
-      { $match: { _id: offerId } },
+      { $match: { _id: offerObjectId } },
       { $lookup: { from: 'comments', localField: '_id', foreignField: 'offerId', as: 'comments' } },
       { $unwind: { path: '$comments', preserveNullAndEmptyArrays: true } },
-      { $group: { _id: '$_id', averageRating: { $avg: '$comments.rating' }, commentCount: { $sum: { $cond: [{ $ifNull: ['$comments', false] }, 1, 0] } } } },
-      { $project: { averageRating: { $ifNull: ['$averageRating', 0] }, commentCount: 1, rating: { $round: [{ $ifNull: ['$averageRating', 0] }, 1] } } }
+      {
+        $group: {
+          _id: '$_id',
+          averageRating: { $avg: '$comments.rating' },
+          commentsCount: { $sum: { $cond: [{ $ifNull: ['$comments', false] }, 1, 0] } }
+        }
+      },
+      {
+        $project: {
+          averageRating: { $ifNull: ['$averageRating', 0] },
+          commentsCount: 1,
+          rating: { $round: [{ $ifNull: ['$averageRating', 0] }, 1] }
+        }
+      }
     ]);
 
     if (result.length > 0) {
-      const { commentCount, rating } = result[0];
+      const { commentsCount, rating } = result[0];
 
       await this.offerModel.findByIdAndUpdate(
-        offerId, { rating: rating, commentCount: commentCount }
+        offerId,
+        { rating, commentsCount }
       );
-      console.log(`Rating ${rating} with ${commentCount} comments updated for offer ${offerId}`);
-    } else {
-      console.log(`Offer ${offerId} not found`);
     }
   }
 
   findPremiumInCity(city: City): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel.find({city, isPremium: true}).populate(['author']).exec();
+    return this.offerModel.find({ city, isPremium: true }).populate(['owner']).exec();
   }
 }

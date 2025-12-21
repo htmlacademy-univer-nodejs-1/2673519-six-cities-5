@@ -48,12 +48,12 @@ export class OfferRdo {
   @Expose()
   public amenities: Amenity[];
 
-  @Expose({ name: 'userId'})
+  @Expose({ name: 'owner'})
   @Type(() => UserRdo)
   public owner: UserRdo;
 
   @Expose()
-  public commentCount: number;
+  public commentsCount: number;
 
   @Expose()
   public coordinates: Coordinates;

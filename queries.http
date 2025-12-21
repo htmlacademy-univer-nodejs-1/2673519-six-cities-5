@@ -1,2 +1,163 @@
-# Get mock data from fake server
-GET http://localhost:3123/api HTTP/1.1
+# REST Client запросы для ручного тестирования
+
+# Типовые ответы (в целом по API):
+# - 200 OK: успешное чтение/обновление
+# - 201 Created: сущность создана
+# - 204 No Content: успешное удаление
+# - 400 Bad Request: некорректный ObjectId или невалидный DTO
+# - 401 Unauthorized: неверный email/пароль (login)
+# - 404 Not Found: сущность не найдена
+# - 500 Internal Server Error: баг/необработанная ситуация
+
+@baseUrl = http://localhost:4000
+@offerId = 68f675a7c19df1821731abb7
+@userId = 507f1f77bcf86cd799439012
+
+############################################
+# USERS
+############################################
+
+### Register (201, 409, 400)
+POST {{baseUrl}}/users/register HTTP/1.1
+Content-Type: application/json
+
+{
+	"name": "Mikhail",
+	"email": "mikhail@example.com",
+	"password": "123456",
+	"type": "обычный"
+}
+
+### Register (invalid DTO -> 400)
+POST {{baseUrl}}/users/register HTTP/1.1
+Content-Type: application/json
+
+{
+	"name": "",
+	"email": "not-an-email",
+	"password": "1",
+	"type": "invalid"
+}
+
+### Login (200, 401, 400)
+POST {{baseUrl}}/users/login HTTP/1.1
+Content-Type: application/json
+
+{
+	"email": "mikhail@example.com",
+	"password": "123456"
+}
+
+### Logout (204)
+POST {{baseUrl}}/users/logout HTTP/1.1
+
+############################################
+# OFFERS
+############################################
+
+### Get all offers (200)
+GET {{baseUrl}}/offers HTTP/1.1
+
+### Create offer (valid) (201, 400)
+POST {{baseUrl}}/offers HTTP/1.1
+Content-Type: application/json
+
+{
+	"title": "Nice apartment in the city",
+	"description": "A long enough description for validation checks.",
+	"city": "Paris",
+	"preview": "preview.jpg",
+	"images": ["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg"],
+	"isPremium": true,
+	"housingType": "apartment",
+	"roomsCount": 2,
+	"guestsCount": 3,
+	"price": 120,
+	"amenities": ["Breakfast"],
+	"owner": "{{userId}}",
+	"coordinates": { "latitude": 48.85661, "longitude": 2.351499 }
+}
+
+### Create offer (invalid DTO -> 400)
+POST {{baseUrl}}/offers HTTP/1.1
+Content-Type: application/json
+
+{
+	"title": "short",
+	"description": "too short",
+	"city": "Paris",
+	"preview": "preview.jpg",
+	"images": ["1.jpg"],
+	"housingType": "apartment",
+	"roomsCount": 0,
+	"guestsCount": 0,
+	"price": 1,
+	"amenities": [],
+	"owner": "{{userId}}",
+	"coordinates": { "latitude": 48.85661, "longitude": 2.351499 }
+}
+
+### Premium offers in city (200)
+GET {{baseUrl}}/offers/premium/Paris HTTP/1.1
+
+### ObjectId middleware check (should be 400)
+GET {{baseUrl}}/offers/abc HTTP/1.1
+
+### Get offer by id (200, 404)
+GET {{baseUrl}}/offers/{{offerId}} HTTP/1.1
+
+### Update offer (patch) (200, 404, 400)
+PATCH {{baseUrl}}/offers/{{offerId}} HTTP/1.1
+Content-Type: application/json
+
+{
+	"title": "Updated title for offer",
+	"price": 200
+}
+
+### Delete offer (204, 404)
+DELETE {{baseUrl}}/offers/{{offerId}} HTTP/1.1
+
+############################################
+# COMMENTS (nested under offer)
+############################################
+
+### Get comments for offer (200, 404, 400)
+GET {{baseUrl}}/offers/{{offerId}}/comments HTTP/1.1
+
+### Create comment for offer (201, 404, 400)
+POST {{baseUrl}}/offers/{{offerId}}/comments HTTP/1.1
+Content-Type: application/json
+
+{
+	"text": "OMFG! Its amazing! Nice place!",
+	"rating": 5,
+	"userId": "{{userId}}"
+}
+
+### Create comment (invalid DTO -> 400)
+POST {{baseUrl}}/offers/{{offerId}}/comments HTTP/1.1
+Content-Type: application/json
+
+{
+	"text": "bad",
+	"rating": 10,
+	"userId": "not-object-id"
+}
+
+############################################
+# FAVORITES
+############################################
+
+### Favorites list (200)
+GET {{baseUrl}}/favorites HTTP/1.1
+Authorization: {{userId}}
+
+### Add to favorites (201, 404, 400)
+POST {{baseUrl}}/favorites/{{offerId}} HTTP/1.1
+Authorization: {{userId}}
+
+### Remove from favorites (204, 404, 400)
+DELETE {{baseUrl}}/favorites/{{offerId}} HTTP/1.1
+Authorization: {{userId}}
+
