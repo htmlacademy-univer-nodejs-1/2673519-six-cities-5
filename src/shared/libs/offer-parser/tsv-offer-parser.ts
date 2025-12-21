@@ -11,7 +11,6 @@ export class TSVOfferParser implements OfferParser {
       ownerAvatar, ownerType, commentsCount, coordinatesString
     ] = line.split('\t');
 
-    // Parse coordinates from "latitude,longitude" format
     const [latitude, longitude] = coordinatesString.split(',');
 
     return {

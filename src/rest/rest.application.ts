@@ -18,7 +18,11 @@ export class RestApplication {
     @inject(Component.ExceptionFilter) private readonly appExceptionFilter: IExceptionFilter,
     @inject(Component.UserController) private readonly userController: IController,
     @inject(Component.OfferController) private readonly offerController: IController,
-  ) {}
+    @inject(Component.CommentController) private readonly commentController: IController,
+    @inject(Component.FavoritesController) private readonly favoritesController: IController,
+  ) {
+    this.server = express();
+  }
 
   public async init() {
     this.logger.info('Start initializating application...');
@@ -51,6 +55,8 @@ export class RestApplication {
     this.logger.info('Init controllers');
     this.server.use('/users', this.userController.router);
     this.server.use('/offers', this.offerController.router);
+    this.server.use('/offers/:offerId/comments', this.commentController.router);
+    this.server.use('/favorites', this.favoritesController.router);
     this.logger.info('Controllers initialized successfully');
   }
 

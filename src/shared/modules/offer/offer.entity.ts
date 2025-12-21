@@ -2,6 +2,14 @@ import { defaultClasses, getModelForClass, modelOptions, prop, Ref } from '@type
 import { Amenity, City, Coordinates, HousingType } from '../../types/index.js';
 import { UserEntity } from '../user/index.js';
 
+class CoordinatesSchema implements Coordinates {
+  @prop({ required: true, type: () => Number })
+  public latitude: number;
+
+  @prop({ required: true, type: () => Number })
+  public longitude: number;
+}
+
 export interface OfferEntity extends defaultClasses.Base {}
 
 @modelOptions({
@@ -56,11 +64,11 @@ export class OfferEntity extends defaultClasses.TimeStamps {
   @prop({ ref: UserEntity, required: true })
   public owner!: Ref<UserEntity>;
 
-  @prop({default: 0, type: () => Number})
-  public commentsCnt!: number;
+  @prop({ default: 0, type: () => Number })
+  public commentsCount!: number;
 
-  @prop({required: true})
-  public coordinates: Coordinates;
+  @prop({ required: true, _id: false, type: () => CoordinatesSchema })
+  public coordinates: CoordinatesSchema;
 }
 
 export const OfferModel = getModelForClass(OfferEntity);

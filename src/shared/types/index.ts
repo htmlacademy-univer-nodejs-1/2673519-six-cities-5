@@ -11,4 +11,5 @@ export { Component } from './component.enum.js';
 export { HttpMethod } from './http-method.enum.js';
 export { RequestBody } from './request-body.type.js';
 export { RequestParams } from './request-params.type.js';
+export { IMiddleware } from './middleware.interface.js';
 export { IRoute } from './route.interface.js';
