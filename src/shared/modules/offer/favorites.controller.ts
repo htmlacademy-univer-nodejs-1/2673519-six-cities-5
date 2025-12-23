@@ -1,8 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
 import { plainToInstance } from 'class-transformer';
-import { BaseController, HttpError, HttpMethod, ValidateObjectIdMiddleware } from '../../libs/rest/index.js';
+import { BaseController, DocumentExistsMiddleware, HttpMethod, ValidateObjectIdMiddleware } from '../../libs/rest/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { Component } from '../../types/index.js';
 import { IOfferService } from './offer-service.interface.js';
@@ -23,13 +22,13 @@ export class FavoritesController extends BaseController {
       path: '/:offerId',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')],
+      middlewares: [new ValidateObjectIdMiddleware('offerId'), new DocumentExistsMiddleware(this.offerService, 'offerId', 'Offer')],
     });
     this.addRoute({
       path: '/:offerId',
       method: HttpMethod.Delete,
       handler: this.delete,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')],
+      middlewares: [new ValidateObjectIdMiddleware('offerId'), new DocumentExistsMiddleware(this.offerService, 'offerId', 'Offer')],
     });
   }
 
@@ -44,21 +43,13 @@ export class FavoritesController extends BaseController {
     const userId = req.headers.authorization ?? '';
     const updatedOffer = await this.offerService.addToFavourites(offerId, userId);
 
-    if (!updatedOffer) {
-      throw new HttpError(StatusCodes.NOT_FOUND, `Offer with id ${offerId} not found.`);
-    }
-
     this.created(res, plainToInstance(OfferRdo, updatedOffer, { excludeExtraneousValues: true }));
   }
 
   public async delete(req: Request, res: Response): Promise<void> {
     const { offerId } = req.params;
     const userId = req.headers.authorization ?? '';
-    const updatedOffer = await this.offerService.deleteFromFavourites(offerId, userId);
-
-    if (!updatedOffer) {
-      throw new HttpError(StatusCodes.NOT_FOUND, `Offer with id ${offerId} not found.`);
-    }
+    await this.offerService.deleteFromFavourites(offerId, userId);
 
     this.noContent(res, {});
   }

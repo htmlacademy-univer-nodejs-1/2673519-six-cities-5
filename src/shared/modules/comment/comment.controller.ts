@@ -1,8 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
 import { plainToInstance } from 'class-transformer';
-import { BaseController, HttpError, HttpMethod, ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/rest/index.js';
+import { BaseController, DocumentExistsMiddleware, HttpMethod, ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/rest/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { Component } from '../../types/index.js';
 import { ICommentService } from './comment-service.interface.js';
@@ -25,24 +24,19 @@ export class CommentController extends BaseController {
       path: '/',
       method: HttpMethod.Get,
       handler: this.index,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')],
+      middlewares: [new ValidateObjectIdMiddleware('offerId'), new DocumentExistsMiddleware(this.offerService, 'offerId', 'Offer')],
     });
 
     this.addRoute({
       path: '/',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(CreateCommentDto)],
+      middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(CreateCommentDto), new DocumentExistsMiddleware(this.offerService, 'offerId', 'Offer')],
     });
   }
 
   public async index(req: Request, res: Response): Promise<void> {
     const { offerId } = req.params;
-
-    const existsOffer = await this.offerService.exists(offerId);
-    if (!existsOffer) {
-      throw new HttpError(StatusCodes.NOT_FOUND, `Offer with id ${offerId} not found.`);
-    }
 
     const comments = await this.commentService.findByOfferId(offerId);
     this.ok(res, plainToInstance(CommentRdo, comments, { excludeExtraneousValues: true }));
@@ -52,11 +46,6 @@ export class CommentController extends BaseController {
     const { offerId } = req.params;
     const body = req.body as CreateCommentDto;
     body.offerId = offerId;
-
-    const existsOffer = await this.offerService.exists(offerId);
-    if (!existsOffer) {
-      throw new HttpError(StatusCodes.NOT_FOUND, `Offer with id ${offerId} not found.`);
-    }
 
     const createdComment = await this.commentService.create(body);
     await this.offerService.calculateRating(offerId);

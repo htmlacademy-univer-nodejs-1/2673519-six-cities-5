@@ -1,5 +1,7 @@
 import { inject, injectable } from 'inversify';
 import express, { Express } from 'express';
+import { mkdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { ILogger } from '../shared/libs/logger/index.js';
 import { IConfig, RestSchema } from '../shared/libs/config/index.js';
 import { Component } from '../shared/types/index.js';
@@ -62,6 +64,12 @@ export class RestApplication {
 
   private async initMiddleware() {
     this.logger.info('Init middleware');
+
+    const uploadDirectory = resolve(process.cwd(), this.config.get('UPLOAD_DIRECTORY'));
+    await mkdir(uploadDirectory, { recursive: true });
+    await mkdir(resolve(uploadDirectory, 'avatars'), { recursive: true });
+    this.server.use('/static', express.static(uploadDirectory));
+
     this.server.use(express.json());
     this.logger.info('Middleware initialized successfully');
   }

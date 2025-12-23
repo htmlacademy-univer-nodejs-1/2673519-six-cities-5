@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { BaseController, HttpError, HttpMethod, ValidateDtoMiddleware } from '../../libs/rest/index.js';
+import { BaseController, DocumentExistsMiddleware, HttpError, HttpMethod, UploadFileMiddleware, ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/rest/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { Component } from '../../types/index.js';
 import { IUserService } from './user-service.interface.js';
@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { plainToInstance } from 'class-transformer';
 import { getSHA256 } from '../../helpers/index.js';
+import { resolve } from 'node:path';
 
 @injectable()
 export class UserController extends BaseController {
@@ -35,6 +36,20 @@ export class UserController extends BaseController {
       middlewares: [new ValidateDtoMiddleware(LoginUserDto)],
     });
     this.addRoute({ path: '/logout', method: HttpMethod.Post, handler: this.logout });
+
+    this.addRoute({
+      path: '/:userId/avatar',
+      method: HttpMethod.Post,
+      handler: this.uploadAvatar,
+      middlewares: [
+        new ValidateObjectIdMiddleware('userId'),
+        new UploadFileMiddleware(
+          resolve(process.cwd(), this.configService.get('UPLOAD_DIRECTORY'), 'avatars'),
+          'avatar'
+        ),
+        new DocumentExistsMiddleware(this.userService, 'userId', 'User'),
+      ],
+    });
   }
 
   public async create(req: Request, res: Response): Promise<void> {
@@ -80,5 +95,23 @@ export class UserController extends BaseController {
 
   public async logout(_req: Request, res: Response): Promise<void> {
     this.noContent(res, { message: 'Logged out successfully' });
+  }
+
+  public async uploadAvatar(req: Request, res: Response): Promise<void> {
+    const { userId } = req.params;
+    const file = (req as Request & { file?: Express.Multer.File }).file;
+
+    if (!file) {
+      throw new HttpError(StatusCodes.BAD_REQUEST, 'Avatar file is required.');
+    }
+
+    const avatarPath = `avatars/${file.filename}`;
+    const updatedUser = await this.userService.updateAvatar(userId, avatarPath);
+
+    if (!updatedUser) {
+      throw new HttpError(StatusCodes.NOT_FOUND, `User with id ${userId} not found.`);
+    }
+
+    this.ok(res, plainToInstance(UserRdo, updatedUser, { excludeExtraneousValues: true }));
   }
 }
