@@ -95,9 +95,9 @@ export class DefaultOfferService implements IOfferService {
       },
       {
         $project: {
-          averageRating: { $ifNull: ['$averageRating', 0] },
+          averageRating: { $ifNull: ['$averageRating', 1] },
           commentsCount: 1,
-          rating: { $round: [{ $ifNull: ['$averageRating', 0] }, 1] }
+          rating: { $round: [{ $ifNull: ['$averageRating', 1] }, 1] }
         }
       }
     ]);

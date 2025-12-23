@@ -22,11 +22,11 @@ export class OfferEntity extends defaultClasses.TimeStamps {
   @prop({ trim: true, required: true, type: () => String })
   public title!: string;
 
-  @prop({ trim: true, type: () => String })
+  @prop({ trim: true, required: true, type: () => String })
   public description!: string;
 
   @prop({ required: true, default: Date.now, type: () => Date })
-  public openDate!: string;
+  public openDate!: Date;
 
   @prop({ required: true, type: () => String })
   public city: City;
@@ -43,7 +43,7 @@ export class OfferEntity extends defaultClasses.TimeStamps {
   @prop({ ref: UserEntity, required: true, default: [] })
   public favoriteUserIds: Ref<UserEntity>[];
 
-  @prop({default: 0, type: () => Number})
+  @prop({ default: 1, min: 1, max: 5, type: () => Number })
   public rating: number;
 
   @prop({ type: () => String })
