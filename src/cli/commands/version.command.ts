@@ -40,7 +40,7 @@ export class VersionCommand implements Command {
   public execute(..._parameters: string[]): void {
     try {
       const version = this.readVersion();
-      console.info(chalk.bgGreen(`Application version: ${chalk.green(version)}`));
+      console.info(version);
     } catch (error: unknown) {
       console.error(chalk.red(`Failed to read version from ${this.filePath}`));
 

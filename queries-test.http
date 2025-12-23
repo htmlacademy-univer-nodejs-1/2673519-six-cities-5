@@ -26,6 +26,10 @@ Content-Type: application/json
 POST {{baseUrl}}/users/logout HTTP/1.1
 Authorization: Bearer {{token}}
 
+### Status
+GET {{baseUrl}}/users/status HTTP/1.1
+Authorization: Bearer {{token}}
+
 ### Get all offers
 GET {{baseUrl}}/offers HTTP/1.1
 Authorization: Bearer {{token}}
@@ -48,6 +52,16 @@ Content-Type: application/json
 	"price": 120,
 	"amenities": ["Breakfast"],
 	"coordinates": { "latitude": 48.85661, "longitude": 2.351499 }
+}
+
+### Update offer
+PATCH {{baseUrl}}/offers/{{offerId}} HTTP/1.1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+	"title": "Updated title",
+	"price": 200
 }
 
 ### Favorites list

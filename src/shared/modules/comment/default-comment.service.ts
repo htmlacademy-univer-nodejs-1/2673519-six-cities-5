@@ -19,7 +19,10 @@ export class DefaultCommentService implements ICommentService {
   public async findByOfferId(offerId: string): Promise<DocumentType<CommentEntity>[]> {
     return this.commentModel
       .find({offerId})
-      .populate('userId');
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .populate('userId')
+      .exec();
   }
 
   public async deleteByOfferId(offerId: string): Promise<number> {

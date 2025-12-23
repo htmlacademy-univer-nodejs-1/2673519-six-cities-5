@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { config as loadEnv } from 'dotenv';
 import { Command } from './command.interface.js';
 import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
 import { TSVOfferParser } from '../../shared/libs/offer-parser/index.js';
@@ -8,7 +9,6 @@ import { DefaultOfferService, OfferModel, IOfferService } from '../../shared/mod
 import { DatabaseClient, MongoDatabaseClient } from '../../shared/libs/db-client/index.js';
 import { ConsoleLogger, ILogger } from '../../shared/libs/logger/index.js';
 import { DefaultUserService, UserModel } from '../../shared/modules/user/index.js';
-import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.const.js';
 import { Offer } from '../../shared/types/index.js';
 
 export class ImportCommand implements Command {
@@ -17,6 +17,7 @@ export class ImportCommand implements Command {
   private offerService: IOfferService;
   private readonly logger: ILogger;
   private salt: string;
+  private defaultUserPassword: string;
 
   constructor() {
     this.logger = new ConsoleLogger();
@@ -32,9 +33,28 @@ export class ImportCommand implements Command {
     return '--import';
   }
 
-  public async execute(filepath: string, login: string, password: string, host: string, dbname: string, salt: string): Promise<void> {
-    const uri = getMongoDbURI(login, password, host, DEFAULT_DB_PORT, dbname);
-    this.salt = salt;
+  private getEnvOrThrow(key: string): string {
+    const value = process.env[key];
+    if (!value) {
+      throw new Error(`Environment variable ${key} is required.`);
+    }
+    return value;
+  }
+
+  public async execute(filepath: string, login?: string, password?: string, host?: string, dbname?: string, salt?: string): Promise<void> {
+    loadEnv();
+
+    const resolvedLogin = login ?? this.getEnvOrThrow('DB_USER');
+    const resolvedPassword = password ?? this.getEnvOrThrow('DB_PASSWORD');
+    const resolvedHost = host ?? this.getEnvOrThrow('DB_HOST');
+    const resolvedDbName = dbname ?? this.getEnvOrThrow('DB_NAME');
+    const resolvedDbPort = this.getEnvOrThrow('DB_PORT');
+    const resolvedSalt = salt ?? this.getEnvOrThrow('SALT');
+    const resolvedDefaultUserPassword = this.getEnvOrThrow('DEFAULT_USER_PASSWORD');
+
+    const uri = getMongoDbURI(resolvedLogin, resolvedPassword, resolvedHost, resolvedDbPort, resolvedDbName);
+    this.salt = resolvedSalt;
+    this.defaultUserPassword = resolvedDefaultUserPassword;
     await this.dbClient.connect(uri);
     const fileReader = new TSVFileReader(filepath.trim());
 
@@ -75,7 +95,7 @@ export class ImportCommand implements Command {
   private async saveOffer(offer: Offer) {
     const user = await this.userService.findOrCreate({
       ...offer.owner,
-      password: DEFAULT_USER_PASSWORD
+      password: this.defaultUserPassword
     }, this.salt);
 
     await this.offerService.create({
@@ -86,13 +106,11 @@ export class ImportCommand implements Command {
       preview: offer.preview,
       images: offer.images,
       isPremium: offer.isPremium,
-      rating: offer.rating,
       housingType: offer.housingType,
       roomsCount: offer.roomsCount,
       guestsCount: offer.guestsCount,
       price: offer.price,
       amenities: offer.amenities,
-      commentsCount: offer.commentsCount,
       coordinates: offer.coordinates
     }, user.id);
   }

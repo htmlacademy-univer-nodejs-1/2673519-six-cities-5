@@ -45,6 +45,13 @@ export class UserController extends BaseController {
     });
 
     this.addRoute({
+      path: '/status',
+      method: HttpMethod.Get,
+      handler: this.status,
+      middlewares: [new PrivateRouteMiddleware(this.authService)],
+    });
+
+    this.addRoute({
       path: '/avatar',
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
@@ -109,6 +116,22 @@ export class UserController extends BaseController {
 
   public async logout(_req: Request, res: Response): Promise<void> {
     this.noContent(res, {});
+  }
+
+  public async status(req: Request, res: Response): Promise<void> {
+    const userEmail = req.user?.email;
+
+    if (!userEmail) {
+      throw new HttpError(StatusCodes.UNAUTHORIZED, 'Authorization required.');
+    }
+
+    const user = await this.userService.findByEmail(userEmail);
+
+    if (!user) {
+      throw new HttpError(StatusCodes.NOT_FOUND, `User with email ${userEmail} not found.`);
+    }
+
+    this.ok(res, plainToInstance(UserRdo, user, { excludeExtraneousValues: true }));
   }
 
   public async uploadAvatar(req: Request, res: Response): Promise<void> {

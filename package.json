@@ -19,12 +19,13 @@
     "ts": "ts-node",
     "cli": "npm run ts ./src/main.cli.ts --",
     "cli:generate": "npm run build && node ./dist/main.cli.js --generate 10 ./mocks/generated-offers.tsv http://localhost:3123/api",
-    "cli:import-db": "npm run build && node ./dist/main.cli.js --import ./mocks/generated-offers.tsv admin admin 127.0.0.1 six-cities 550e8400-e29b-41d4-a716-446655440000",
+    "cli:import-db": "npm run build && node ./dist/main.cli.js --import ./mocks/generated-offers.tsv",
     "mock:server": "json-server ./mocks/mock-server-data.json --port 3123"
   },
   "devDependencies": {
     "@types/convict": "6.1.6",
     "@types/convict-format-with-validator": "6.0.5",
+    "@types/cors": "^2.8.19",
     "@types/express": "5.0.5",
     "@types/mime-types": "3.0.1",
     "@types/multer": "2.0.0",
@@ -51,6 +52,7 @@
     "class-validator": "0.14.3",
     "convict": "6.2.4",
     "convict-format-with-validator": "6.2.0",
+    "cors": "^2.8.5",
     "dotenv": "17.2.3",
     "express": "5.1.0",
     "express-async-handler": "1.2.0",

@@ -52,6 +52,10 @@ Content-Type: application/json
 POST {{baseUrl}}/users/logout HTTP/1.1
 Authorization: Bearer {{token}}
 
+### User status (check auth) (200, 401, 404)
+GET {{baseUrl}}/users/status HTTP/1.1
+Authorization: Bearer {{token}}
+
 ### Upload avatar (multipart/form-data) (200, 400, 404)
 # JPG/PNG
 # /static/avatars/<filename>
