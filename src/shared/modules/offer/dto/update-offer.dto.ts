@@ -1,7 +1,17 @@
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsIn, IsInt, IsOptional, IsString, Length, Max, Min } from 'class-validator';
-import { Amenity, amenities, HousingType, housingTypes } from '../../../types/index.js';
+import { Type } from 'class-transformer';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsDateString, IsIn, IsInt, IsOptional, IsString, Length, Max, Min, ValidateNested } from 'class-validator';
+import { Amenity, amenities, City, cities, HousingType, housingTypes } from '../../../types/index.js';
+import { CoordinatesDto } from './coordinates.dto.js';
 
 export class UpdateOfferDto {
+    @IsOptional()
+    @IsDateString()
+      openDate?: Date;
+
+    @IsOptional()
+    @IsIn(cities)
+      city?: City;
+
     @IsOptional()
     @IsString()
     @Length(10, 100)
@@ -53,4 +63,9 @@ export class UpdateOfferDto {
     @IsArray()
     @IsIn(amenities, { each: true })
       amenities?: Amenity[];
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => CoordinatesDto)
+      coordinates?: CoordinatesDto;
 }

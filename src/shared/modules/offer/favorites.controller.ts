@@ -6,6 +6,7 @@ import { BaseController, DocumentExistsMiddleware, HttpError, HttpMethod, Privat
 import { ILogger } from '../../libs/logger/index.js';
 import { Component } from '../../types/index.js';
 import { IOfferService } from './offer-service.interface.js';
+import { OfferPreviewRdo } from './rdo/offer-preview.rdo.js';
 import { OfferRdo } from './rdo/offer.rdo.js';
 import { IAuthService } from '../../libs/auth/index.js';
 import { DocumentType } from '@typegoose/typegoose';
@@ -64,7 +65,7 @@ export class FavoritesController extends BaseController {
 
     const offers = await this.offerService.getFavourites(userId);
     const adaptedOffers = offers.map((offer) => this.adaptOffer(offer, userId));
-    this.ok(res, plainToInstance(OfferRdo, adaptedOffers, { excludeExtraneousValues: true }));
+    this.ok(res, plainToInstance(OfferPreviewRdo, adaptedOffers, { excludeExtraneousValues: true }));
   }
 
   public async create(req: Request, res: Response): Promise<void> {

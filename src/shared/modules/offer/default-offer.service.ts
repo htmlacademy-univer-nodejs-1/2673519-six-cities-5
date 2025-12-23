@@ -16,12 +16,17 @@ export class DefaultOfferService implements IOfferService {
   ) {}
 
   public async create(dto: CreateOfferDto, ownerId: string): Promise<DocumentType<OfferEntity>> {
-    const result = await this.offerModel.create({
+    const created = await this.offerModel.create({
       ...dto,
       owner: ownerId,
       favoriteUserIds: [],
     });
     this.logger.info(`New offer created: ${dto.title}`);
+
+    const result = await this.offerModel.findById(created.id).populate(['owner']).exec();
+    if (!result) {
+      return created;
+    }
     return result;
   }
 
@@ -29,8 +34,13 @@ export class DefaultOfferService implements IOfferService {
     return this.offerModel.findById(offerId).populate(['owner']).exec();
   }
 
-  public async find(): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel.find().populate(['owner']).exec();
+  public async find(limit = 60): Promise<DocumentType<OfferEntity>[]> {
+    return this.offerModel
+      .find()
+      .sort({ openDate: -1 })
+      .limit(limit)
+      .populate(['owner'])
+      .exec();
   }
 
   public async exists(documentId: string): Promise<boolean> {
@@ -54,7 +64,11 @@ export class DefaultOfferService implements IOfferService {
   }
 
   getFavourites(userId: string): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel.find({ favoriteUserIds: userId }).populate(['owner']).exec();
+    return this.offerModel
+      .find({ favoriteUserIds: userId })
+      .sort({ openDate: -1 })
+      .populate(['owner'])
+      .exec();
   }
 
   public async addToFavourites(offerId: string, userId: string): Promise<DocumentType<OfferEntity> | null> {
@@ -112,7 +126,12 @@ export class DefaultOfferService implements IOfferService {
     }
   }
 
-  findPremiumInCity(city: City): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel.find({ city, isPremium: true }).populate(['owner']).exec();
+  findPremiumInCity(city: City, limit = 3): Promise<DocumentType<OfferEntity>[]> {
+    return this.offerModel
+      .find({ city, isPremium: true })
+      .sort({ openDate: -1 })
+      .limit(limit)
+      .populate(['owner'])
+      .exec();
   }
 }
