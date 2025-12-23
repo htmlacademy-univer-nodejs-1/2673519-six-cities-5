@@ -1,8 +1,12 @@
 import { Expose, Transform } from 'class-transformer';
+import { UserType } from '../../../types/index.js';
 
 const DEFAULT_AVATAR_PATH = 'avatars/default-avatar.jpg';
 
 export class UserRdo {
+  @Expose()
+  public name: string;
+
   @Expose()
   public email: string;
 
@@ -11,8 +15,5 @@ export class UserRdo {
   public avatar: string;
 
   @Expose()
-  public firstname: string;
-
-  @Expose()
-  public lastname: string;
+  public type: UserType;
 }

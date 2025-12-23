@@ -19,7 +19,7 @@
     "ts": "ts-node",
     "cli": "npm run ts ./src/main.cli.ts --",
     "cli:generate": "npm run build && node ./dist/main.cli.js --generate 10 ./mocks/generated-offers.tsv http://localhost:3123/api",
-    "cli:import-db": "npm run build && node ./dist/main.cli.js --import ./mocks/generated-offers.tsv admin admin 127.0.0.1 six-cities 550e8400-e29b-41d4-a716-446655440000",
+    "cli:import-db": "npm run build && node ./dist/main.cli.js --import ./mocks/generated-offers.tsv",
     "mock:server": "json-server ./mocks/mock-server-data.json --port 3123"
   },
   "devDependencies": {

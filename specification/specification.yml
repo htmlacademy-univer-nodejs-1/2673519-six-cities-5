@@ -53,11 +53,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/Offer'
 
-  /offers/premium:
+  /offers/premium/{city}:
     get:
-      summary: Получение списка всех премиальных предложений
+      summary: Получение списка премиальных предложений для города
       tags:
         - offers
+      parameters:
+        - name: city
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [Paris, Cologne, Brussels, Amsterdam, Hamburg, Dusseldorf]
       responses:
         '200':
           description: Успешное получение премиальных предложений
@@ -78,7 +85,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: Детальная информация по предложению успешно получена
@@ -89,7 +96,7 @@ paths:
         '404':
           description:  Предложение не было найдено
 
-    put:
+    patch:
       summary: Редактировать предложение по id
       tags:
         - offers
@@ -100,7 +107,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       requestBody:
         required: true
         content:
@@ -128,7 +135,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '204':
           description: Предложение успешно удалено
@@ -188,7 +195,7 @@ paths:
         '404':
           description: Предложения не существует
 
-  /auth:
+  /users/register:
     post:
       summary: Регистрация
       tags:
@@ -209,7 +216,7 @@ paths:
         '404':
           description: Введены некорректные данные
 
-  /login:
+  /users/login:
     post:
       summary: Авторизация
       tags:
@@ -230,7 +237,7 @@ paths:
         '401':
           description: Неверные данные для входа
 
-  /user/{userId}/logout:
+  /users/logout:
     post:
       summary: Выход
       tags:
@@ -241,26 +248,20 @@ paths:
         '204':
           description: Успешный выход
 
-  /user/{userId}/status:
+  /users/status:
     get:
       summary: Проверка состояния пользователя
       tags:
         - users
       security:
         - bearerAuth: []
-      parameters:
-        - name: offerId
-          in: path
-          required: true
-          schema:
-            type: integer
       responses:
         '200':
           description: Статус пользователя
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserStatus'
+                $ref: '#/components/schemas/User'
 
   /favorites:
     get:
@@ -291,7 +292,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '201':
           description: Предложение добавлено в избранное
@@ -309,7 +310,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '204':
           description: Предложение удалено из избранного
@@ -322,7 +323,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         title:
           type: string
         description:
@@ -364,7 +365,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         title:
           type: string
         city:
@@ -523,7 +524,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
         email:
