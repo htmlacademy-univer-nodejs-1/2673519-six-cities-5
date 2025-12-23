@@ -9,7 +9,6 @@ import { DefaultOfferService, OfferModel, IOfferService } from '../../shared/mod
 import { DatabaseClient, MongoDatabaseClient } from '../../shared/libs/db-client/index.js';
 import { ConsoleLogger, ILogger } from '../../shared/libs/logger/index.js';
 import { DefaultUserService, UserModel } from '../../shared/modules/user/index.js';
-import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.const.js';
 import { Offer } from '../../shared/types/index.js';
 
 export class ImportCommand implements Command {
@@ -18,6 +17,7 @@ export class ImportCommand implements Command {
   private offerService: IOfferService;
   private readonly logger: ILogger;
   private salt: string;
+  private defaultUserPassword: string;
 
   constructor() {
     this.logger = new ConsoleLogger();
@@ -48,11 +48,13 @@ export class ImportCommand implements Command {
     const resolvedPassword = password ?? this.getEnvOrThrow('DB_PASSWORD');
     const resolvedHost = host ?? this.getEnvOrThrow('DB_HOST');
     const resolvedDbName = dbname ?? this.getEnvOrThrow('DB_NAME');
-    const resolvedDbPort = process.env.DB_PORT ?? DEFAULT_DB_PORT;
+    const resolvedDbPort = this.getEnvOrThrow('DB_PORT');
     const resolvedSalt = salt ?? this.getEnvOrThrow('SALT');
+    const resolvedDefaultUserPassword = this.getEnvOrThrow('DEFAULT_USER_PASSWORD');
 
     const uri = getMongoDbURI(resolvedLogin, resolvedPassword, resolvedHost, resolvedDbPort, resolvedDbName);
     this.salt = resolvedSalt;
+    this.defaultUserPassword = resolvedDefaultUserPassword;
     await this.dbClient.connect(uri);
     const fileReader = new TSVFileReader(filepath.trim());
 
@@ -93,7 +95,7 @@ export class ImportCommand implements Command {
   private async saveOffer(offer: Offer) {
     const user = await this.userService.findOrCreate({
       ...offer.owner,
-      password: DEFAULT_USER_PASSWORD
+      password: this.defaultUserPassword
     }, this.salt);
 
     await this.offerService.create({

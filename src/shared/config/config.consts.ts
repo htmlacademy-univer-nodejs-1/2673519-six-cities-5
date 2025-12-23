@@ -15,6 +15,3 @@ export const MAX_PRICE = 100_000;
 
 export const DB_CONNECTION_MAX_RETRIES = 10;
 export const DB_CONNECTION_TIMEOUT = 1000;
-
-export const DEFAULT_DB_PORT = '27017';
-export const DEFAULT_USER_PASSWORD = '123456';

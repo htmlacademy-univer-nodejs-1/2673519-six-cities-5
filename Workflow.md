@@ -21,6 +21,7 @@ npm install
 - `DB_USER=admin` — логин администратора MongoDB.
 - `DB_PASSWORD=admin` — пароль администратора MongoDB.
 - `SALT=...` — соль для хеширования паролей.
+- `DEFAULT_USER_PASSWORD=...` — пароль по умолчанию для пользователей, создаваемых при CLI-импорте TSV.
 - `UPLOAD_DIRECTORY=upload` — директория для загружаемых файлов (аватары и т.п.).
 - `JWT_SECRET=...` — секрет для подписи JWT.
 - `JWT_EXPIRES_IN=2d` — срок жизни JWT (например: `2d`, `12h`, `60m`).

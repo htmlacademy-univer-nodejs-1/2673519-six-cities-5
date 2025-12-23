@@ -11,9 +11,12 @@ export class ValidateDtoMiddleware implements IMiddleware {
   ) {}
 
   public async execute(req: Request, _res: Response, next: NextFunction): Promise<void> {
-    const instance = plainToInstance(this.dtoClass, req.body);
+    const instance = plainToInstance(this.dtoClass, req.body, {
+      enableImplicitConversion: true,
+    });
     const errors = await validate(instance, {
       whitelist: true,
+      forbidNonWhitelisted: true,
       forbidUnknownValues: true,
     });
 
