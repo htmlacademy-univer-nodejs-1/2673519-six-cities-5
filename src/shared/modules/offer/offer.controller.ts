@@ -46,12 +46,6 @@ export default class OfferController extends BaseController {
       middlewares: [new ParseTokenMiddleware(this.authService)],
     });
     this.addRoute({
-      path: '/favorites',
-      method: HttpMethod.Get,
-      handler: this.getFavorites,
-      middlewares: [new PrivateRouteMiddleware(this.authService)],
-    });
-    this.addRoute({
       path: '/:offerId',
       method: HttpMethod.Get,
       handler: this.show,
@@ -206,17 +200,6 @@ export default class OfferController extends BaseController {
     const { city } = req.params;
     const offers = await this.offerService.findPremiumInCity(city as City);
     const adaptedOffers = offers.map((offer) => this.adaptOffer(offer, req.user?.id));
-    this.ok(res, plainToInstance(OfferPreviewRdo, adaptedOffers, { excludeExtraneousValues: true }));
-  }
-
-  public async getFavorites(req: Request, res: Response): Promise<void> {
-    const userId = req.user?.id;
-    if (!userId) {
-      throw new HttpError(StatusCodes.UNAUTHORIZED, 'Authorization required.');
-    }
-
-    const offers = await this.offerService.getFavourites(userId);
-    const adaptedOffers = offers.map((offer) => this.adaptOffer(offer, userId));
     this.ok(res, plainToInstance(OfferPreviewRdo, adaptedOffers, { excludeExtraneousValues: true }));
   }
 }

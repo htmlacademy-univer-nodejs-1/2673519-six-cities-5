@@ -1,5 +1,6 @@
 import { inject, injectable } from 'inversify';
 import express, { Express } from 'express';
+import cors from 'cors';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { ILogger } from '../shared/libs/logger/index.js';
@@ -70,6 +71,7 @@ export class RestApplication {
     await mkdir(resolve(uploadDirectory, 'avatars'), { recursive: true });
     this.server.use('/static', express.static(uploadDirectory));
 
+    this.server.use(cors());
     this.server.use(express.json());
     this.logger.info('Middleware initialized successfully');
   }
