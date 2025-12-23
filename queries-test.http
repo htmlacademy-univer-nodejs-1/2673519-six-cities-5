@@ -26,6 +26,10 @@ Content-Type: application/json
 POST {{baseUrl}}/users/logout HTTP/1.1
 Authorization: Bearer {{token}}
 
+### Status
+GET {{baseUrl}}/users/status HTTP/1.1
+Authorization: Bearer {{token}}
+
 ### Get all offers
 GET {{baseUrl}}/offers HTTP/1.1
 Authorization: Bearer {{token}}
