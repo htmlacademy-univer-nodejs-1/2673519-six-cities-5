@@ -28,10 +28,6 @@ export class UpdateOfferDto {
       isPremium?: boolean;
 
     @IsOptional()
-    @IsBoolean()
-      isFavorite?: boolean;
-
-    @IsOptional()
     @IsIn(housingTypes)
       housingType?: HousingType;
 

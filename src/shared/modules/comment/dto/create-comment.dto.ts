@@ -13,7 +13,4 @@ export class CreateCommentDto {
   @IsOptional()
   @IsMongoId()
   public offerId?: string;
-
-  @IsMongoId()
-  public userId: string;
 }

@@ -15,8 +15,12 @@ export class DefaultOfferService implements IOfferService {
     @inject(Component.OfferModel) private readonly offerModel: types.ModelType<OfferEntity>
   ) {}
 
-  public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
-    const result = await this.offerModel.create(dto);
+  public async create(dto: CreateOfferDto, ownerId: string): Promise<DocumentType<OfferEntity>> {
+    const result = await this.offerModel.create({
+      ...dto,
+      owner: ownerId,
+      favoriteUserIds: [],
+    });
     this.logger.info(`New offer created: ${dto.title}`);
     return result;
   }
@@ -50,25 +54,25 @@ export class DefaultOfferService implements IOfferService {
   }
 
   getFavourites(userId: string): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel.find({ isFavorite: userId }).populate(['owner']).exec();
+    return this.offerModel.find({ favoriteUserIds: userId }).populate(['owner']).exec();
   }
 
-  addToFavourites(offerId: string, userId: string): Promise<DocumentType<OfferEntity> | null> {
+  public async addToFavourites(offerId: string, userId: string): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel
       .findByIdAndUpdate(
         offerId,
-        { $addToSet: { isFavorite: userId } },
+        { $addToSet: { favoriteUserIds: userId } },
         { new: true }
       )
       .populate(['owner'])
       .exec();
   }
 
-  async deleteFromFavourites(offerId: string, userId: string): Promise<DocumentType<OfferEntity> | null> {
+  public async deleteFromFavourites(offerId: string, userId: string): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel
       .findByIdAndUpdate(
         offerId,
-        { $pull: { isFavorite: userId } },
+        { $pull: { favoriteUserIds: userId } },
         { new: true }
       )
       .populate(['owner'])

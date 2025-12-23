@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsDateString, IsIn, IsInt, IsMongoId, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsDateString, IsIn, IsInt, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateNested } from 'class-validator';
 import { Amenity, amenities, City, cities, HousingType, housingTypes } from '../../../types/index.js';
 import { CoordinatesDto } from './coordinates.dto.js';
 
@@ -33,10 +33,6 @@ export class CreateOfferDto {
     isPremium?: boolean;
 
   @IsOptional()
-  @IsBoolean()
-    isFavorite?: boolean;
-
-  @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(5)
@@ -63,9 +59,6 @@ export class CreateOfferDto {
   @IsArray()
   @IsIn(amenities, { each: true })
     amenities: Amenity[];
-
-  @IsMongoId()
-    owner: string;
 
   @IsOptional()
   @IsInt()

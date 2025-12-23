@@ -1,0 +1,76 @@
+@baseUrl = http://localhost:4000
+@offerId = 694aa0388eb2a4216b4ccb53
+@token = eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY5NGE5ZWFlOGViMmE0MjE2YjRjY2I0ZiIsImVtYWlsIjoibWlraGFpbGtvbm9ub3ZAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjY0OTgyNTMsImV4cCI6MTc2NjY3MTA1M30.YMfnATJ3BbElahigfCH0zghi23AoBHaJTlE3ImXLmds
+
+### Authorization
+POST {{baseUrl}}/users/register HTTP/1.1
+Content-Type: application/json
+
+{
+	"name": "Mikhail",
+	"email": "mikhailkononov@example.com",
+	"password": "123456",
+	"type": "обычный"
+}
+
+### Login
+POST {{baseUrl}}/users/login HTTP/1.1
+Content-Type: application/json
+
+{
+	"email": "mikhailkononov@example.com",
+	"password": "123456"
+}
+
+### Logout
+POST {{baseUrl}}/users/logout HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Get all offers
+GET {{baseUrl}}/offers HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Create offer
+POST {{baseUrl}}/offers HTTP/1.1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+	"title": "Makron house",
+	"description": "Feel yourself like a king in this luxurious house located in the heart of the city.",
+	"city": "Paris",
+	"preview": "preview.jpg",
+	"images": ["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg"],
+	"isPremium": true,
+	"housingType": "apartment",
+	"roomsCount": 2,
+	"guestsCount": 3,
+	"price": 120,
+	"amenities": ["Breakfast"],
+	"coordinates": { "latitude": 48.85661, "longitude": 2.351499 }
+}
+
+### Favorites list
+GET {{baseUrl}}/favorites HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Add to favorites
+POST {{baseUrl}}/favorites/{{offerId}} HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Remove from favorites
+DELETE {{baseUrl}}/favorites/{{offerId}} HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Get comments
+GET {{baseUrl}}/offers/{{offerId}}/comments HTTP/1.1
+
+### Create comment
+POST {{baseUrl}}/offers/{{offerId}}/comments HTTP/1.1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+	"text": "OMFG! Its amazing! Nice place!",
+	"rating": 5
+}
