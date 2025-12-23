@@ -4,7 +4,7 @@ import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { City } from '../../types/city.type.js';
 
 export interface IOfferService {
-  create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>>;
+  create(dto: CreateOfferDto, ownerId: string): Promise<DocumentType<OfferEntity>>;
   findById(offerId: string): Promise<DocumentType<OfferEntity> | null>;
   find(): Promise<DocumentType<OfferEntity>[]>;
   exists(documentId: string): Promise<boolean>;

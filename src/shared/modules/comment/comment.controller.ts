@@ -1,13 +1,15 @@
 import { inject, injectable } from 'inversify';
 import { Request, Response } from 'express';
 import { plainToInstance } from 'class-transformer';
-import { BaseController, DocumentExistsMiddleware, HttpMethod, ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/rest/index.js';
+import { StatusCodes } from 'http-status-codes';
+import { BaseController, DocumentExistsMiddleware, HttpError, HttpMethod, PrivateRouteMiddleware, ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/rest/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { Component } from '../../types/index.js';
 import { ICommentService } from './comment-service.interface.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
 import { CommentRdo } from './rdo/comment.rdo.js';
 import { IOfferService } from '../offer/offer-service.interface.js';
+import { IAuthService } from '../../libs/auth/index.js';
 
 @injectable()
 export class CommentController extends BaseController {
@@ -15,6 +17,7 @@ export class CommentController extends BaseController {
     @inject(Component.Logger) protected readonly logger: ILogger,
     @inject(Component.CommentService) private readonly commentService: ICommentService,
     @inject(Component.OfferService) private readonly offerService: IOfferService,
+    @inject(Component.AuthService) private readonly authService: IAuthService,
   ) {
     super(logger);
 
@@ -31,7 +34,12 @@ export class CommentController extends BaseController {
       path: '/',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(CreateCommentDto), new DocumentExistsMiddleware(this.offerService, 'offerId', 'Offer')],
+      middlewares: [
+        new PrivateRouteMiddleware(this.authService),
+        new ValidateObjectIdMiddleware('offerId'),
+        new ValidateDtoMiddleware(CreateCommentDto),
+        new DocumentExistsMiddleware(this.offerService, 'offerId', 'Offer')
+      ],
     });
   }
 
@@ -47,7 +55,12 @@ export class CommentController extends BaseController {
     const body = req.body as CreateCommentDto;
     body.offerId = offerId;
 
-    const createdComment = await this.commentService.create(body);
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new HttpError(StatusCodes.UNAUTHORIZED, 'Authorization required.');
+    }
+
+    const createdComment = await this.commentService.create(body, userId);
     await this.offerService.calculateRating(offerId);
 
     this.created(res, plainToInstance(CommentRdo, createdComment, { excludeExtraneousValues: true }));
